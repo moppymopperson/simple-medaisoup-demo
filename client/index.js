@@ -33,9 +33,9 @@ const createRoom = () => {
   return room
 }
 
-const joinRoom = () => {
+global.joinRoom = () => {
   const room = createRoom()
-  const username = documnet.queryElementById('username').value
+  const username = document.getElementById('username').value
   console.log(`Joining room as ${username}!`)
   room.join(username).then(peers => {
     console.log('Creating send and receive transports!')
@@ -45,9 +45,6 @@ const joinRoom = () => {
     peers.forEach(handleNewPeer)
   })
 }
-
-const joinButton = document.getElementById('join')
-joinButton.onClick = joinRoom
 
 const handleNewPeer = peer => {
   console.log(`Peer ${peer.name} joined the room!`)
