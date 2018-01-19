@@ -1,4 +1,5 @@
 cert/
+bundle.js
 
 # Logs
 logs

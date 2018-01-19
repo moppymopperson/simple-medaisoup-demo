@@ -3,7 +3,7 @@
 const io = require('socket.io-client')
 const mediasoupClient = require('mediasoup-client')
 const room = new mediasoupClient.Room();
-const socket = io('http://localhost:3000')
+const socket = io('http://192.168.3.7:3000')
 let receiveTransport
 
 socket.on('connect', () => {
@@ -61,6 +61,7 @@ const handleConsumer = consumer => {
     const context = new AudioContext()
     const source = context.createMediaStreamSource(stream)
     const processor = context.createScriptProcessor(1024, 1, 1)
+    console.log('MediaStream', stream)
 
     let count = 0
     source.connect(processor)
@@ -72,6 +73,9 @@ const handleConsumer = consumer => {
       }
       count += 1
     }
+
+    const audio = document.querySelector("audio")
+    audio.srcObject = stream
   })
 }
 
@@ -84,7 +88,7 @@ const startMic = () => {
     const track = stream.getAudioTracks()[0]
     console.log('Using audio device: ' + track.label);
     room.createProducer(track).send(transport)
-    track.stop()
+    console.log('Testing')
   })
 }
 

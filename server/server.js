@@ -69,6 +69,3 @@ io.on('connection', socket => {
     socket.on('notify', notify)
     socket.on('request', request)
 })
-
-
-
