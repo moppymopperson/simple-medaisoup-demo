@@ -15,6 +15,9 @@ const webServer = http.createServer(app).listen(3000, () => {
 // Create a socket.io server
 const io = socketio(webServer)
 
+// Create a map that links websocket ids with peer names
+const participants = new Map()
+
 // Create an Selective Forwarding Unit (SFU) server
 const soupServer = mediasoup.Server({ logLevel: "debug" })
 const mediaCodecs = [
@@ -29,6 +32,13 @@ const mediaCodecs = [
     }
 ]
 const room = soupServer.Room(mediaCodecs)
+
+const disconnected = socket => {
+    console.log(`Socket with id ${socket.id} disconnected`)
+    if (participants[socket.id]) {
+        room.getPeerByName(participants[socket.id]).close()
+    }
+}
 
 const notify = notification => {
     console.log('Notification!', notification)
@@ -59,13 +69,32 @@ const requestPeer = (request, callback) => {
 const requestRoom = (request, callback) => {
     console.log('  Forwarding request to the room')
     room.receiveRequest(request)
-        .then(callback).catch(e => {
-            console.log(e)
-        })
+        .then(callback)
+        .catch(e => { console.log(e) })
 }
+
+const handlePeer = peer => {
+    console.log('New peer: ' + peer.name)
+    participants[peer.appData.socketId] = peer.name
+
+    peer.on('notify', notification => {
+        notification.peerName = peer.name
+        notify(notification)
+    })
+
+    peer.on('close', () => {
+        console.log(`Closed peer ${peer.name}`)
+    })
+}
+
+room.on('newpeer', handlePeer)
+room.on('close', () => {
+    console.log('Room closed')
+})
 
 io.on('connection', socket => {
     console.log('New connection')
     socket.on('notify', notify)
     socket.on('request', request)
+    socket.on('disconnect', () => { disconnected(socket) })
 })

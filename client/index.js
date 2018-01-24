@@ -3,7 +3,7 @@
 const io = require('socket.io-client')
 const mediasoupClient = require('mediasoup-client')
 const room = new mediasoupClient.Room();
-const socket = io('http://192.168.3.7:3000')
+const socket = io('http://localhost:3000')
 let receiveTransport
 
 socket.on('connect', () => {
@@ -95,7 +95,7 @@ const startMic = () => {
 global.joinRoom = () => {
   const username = document.getElementById('username').value
   console.log(`Joining room as ${username}!`)
-  room.join(username)
+  room.join(username, { socketId: socket.id })
     .then(peers => {
       console.log('Joined!')
       receiveTransport = room.createTransport('recv')
