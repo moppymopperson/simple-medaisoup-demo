@@ -36,6 +36,7 @@ const room = soupServer.Room(mediaCodecs)
 const disconnected = socket => {
     console.log(`Socket with id ${socket.id} disconnected`)
     if (participants[socket.id]) {
+        console.log(`Removing ${participants[socket.id]} from room`)
         room.getPeerByName(participants[socket.id]).close()
     }
 }
