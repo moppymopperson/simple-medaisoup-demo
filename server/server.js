@@ -1,4 +1,4 @@
-process.env.DEBUG = 'mediasoup*'
+//process.env.DEBUG = 'mediasoup*'
 
 const fs = require('fs')
 const http = require('http')
@@ -75,7 +75,7 @@ const requestPeer = (request, callback) => {
 }
 
 const requestRoom = (request, callback) => {
-  //console.log('  Forwarding request to the room')
+  console.log('  Forwarding request to the room')
   room
     .receiveRequest(request)
     .then(callback)
@@ -89,8 +89,8 @@ const handlePeer = peer => {
   participants[peer.appData.socketId] = peer.name
 
   peer.on('notify', notification => {
-    notification.peerName = peer.name
-    notify(notification)
+    const socket = io.sockets.connected[peer.appData.socketId]
+    socket.emit('notify', notification)
   })
 
   peer.on('close', () => {

@@ -40,14 +40,6 @@ room.on('newpeer', peer => {
 
 const handlePeer = peer => {
   console.log(`handling peer: ${peer.name}`)
-  peer.on('notify', notification => {
-    notification.peerName = peer.name
-    socket.emit('notify', notification)
-  })
-  peer.on('request', (request, answer) => {
-    request.peerName = peer.name
-    socket.emit('request', request, answer)
-  })
   peer.on('newconsumer', handleConsumer)
   peer.consumers.forEach(handleConsumer)
 }
