@@ -2,7 +2,7 @@
 
 const io = require('socket.io-client')
 const mediasoupClient = require('mediasoup-client')
-const room = new mediasoupClient.Room();
+const room = new mediasoupClient.Room()
 const socket = io('http://localhost:3000')
 let receiveTransport
 
@@ -16,6 +16,7 @@ socket.on('error', () => {
   console.log(error)
 })
 socket.on('notify', notification => {
+  console.log('RECEIVED NOTIFICATION!!')
   room.receiveNotification(notification)
 })
 
@@ -74,7 +75,7 @@ const handleConsumer = consumer => {
       count += 1
     }
 
-    const audio = document.querySelector("audio")
+    const audio = document.querySelector('audio')
     audio.srcObject = stream
   })
 }
@@ -82,25 +83,26 @@ const handleConsumer = consumer => {
 const startMic = () => {
   console.log('Starting mic...')
   const transport = room.createTransport('send')
-  navigator.mediaDevices.getUserMedia({
-    audio: true, video: false
-  }).then(stream => {
-    const track = stream.getAudioTracks()[0]
-    console.log('Using audio device: ' + track.label);
-    room.createProducer(track).send(transport)
-    console.log('Testing')
-  })
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: true,
+      video: false
+    })
+    .then(stream => {
+      const track = stream.getAudioTracks()[0]
+      console.log('Using audio device: ' + track.label)
+      room.createProducer(track).send(transport)
+      console.log('Testing')
+    })
 }
 
 global.joinRoom = () => {
   const username = document.getElementById('username').value
   console.log(`Joining room as ${username}!`)
-  room.join(username, { socketId: socket.id })
-    .then(peers => {
-      console.log('Joined!')
-      receiveTransport = room.createTransport('recv')
-      peers.forEach(handlePeer)
-      startMic()
-    });
+  room.join(username, { socketId: socket.id }).then(peers => {
+    console.log('Joined!')
+    receiveTransport = room.createTransport('recv')
+    peers.forEach(handlePeer)
+    startMic()
+  })
 }
-
